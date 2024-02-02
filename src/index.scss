@@ -5,6 +5,14 @@
 
 @layer base {
   body {
-    font-family: 'DM Sans', sans-serif;
+    @apply bg-slate-900 font-body p-10;
+  }
+}
+
+@layer components {
+  .page-container {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
