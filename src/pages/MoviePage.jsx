@@ -1,9 +1,25 @@
 import useSWR from "swr"
-import { fetcher } from "../config"
+import { apiKey, fetcher } from "../config"
 import MovieCart from "../components/movie/MovieCart"
+import { useEffect, useState } from "react"
+import useDebounce from "../hooks/useDebounce"
 
 const MoviePage = () => {
-  const { data, error, isLoading } = useSWR(`https://api.themoviedb.org/3/movie/popular?api_key=689b5231c55ce30f61d654cb4851693a`, fetcher)
+  const [query, setQuery] = useState("")
+  const [url, setUrl] = useState(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`)
+  const debounceValue = useDebounce(query)
+
+  const handleInputChange = (e) => { setQuery(e.target.value) }
+
+  const { data, isLoading } = useSWR(url, fetcher)
+
+  useEffect(() => {
+    if (debounceValue)
+      setUrl(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${debounceValue}`)
+    else
+      setUrl(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`)
+  }, [debounceValue])
+
   return (
     <div className="page-container">
       <div className="flex mb-10 text-white">
@@ -11,15 +27,20 @@ const MoviePage = () => {
           <input
             type="text"
             placeholder="Typing to search movies ..."
-            className="w-full p-3 rounded-l-lg outline-none bg-slate-800" />
+            className="w-full p-3 rounded-l-lg outline-none bg-slate-800"
+            onChange={handleInputChange}
+          />
         </div>
         <button className="px-4 rounded-r-lg bg-primary"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
         </svg>
         </button>
       </div>
+      {
+        isLoading && <div className="w-10 h-10 mx-auto border-4 rounded-full border-primary border-t-transparent animate-spin"></div>
+      }
       <div className="grid grid-cols-4 gap-10 text-white">
-        {data && data.results?.length > 0 && data.results.map(item => (
+        {!isLoading && data && data.results?.length > 0 && data.results.map(item => (
           <MovieCart key={item.id} item={item}></MovieCart>
         ))}
       </div>
