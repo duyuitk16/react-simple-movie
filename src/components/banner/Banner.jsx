@@ -1,12 +1,12 @@
 import { SwiperSlide, Swiper } from "swiper/react"
 import useSWR from "swr"
-import { fetcher } from "../../config"
+import { fetcher, tmdbAPI } from "~/config"
 import Button from "../button/Button"
 import { useNavigate } from "react-router-dom"
 
 
 const Banner = () => {
-  const { data, error, isLoading } = useSWR("https://api.themoviedb.org/3/movie/upcoming?api_key=689b5231c55ce30f61d654cb4851693a", fetcher)
+  const { data } = useSWR(tmdbAPI.getMovieList("upcoming"), fetcher)
   return (
     <section className="banner page-container h-[600px] mb-20">
       <Swiper grabCursor={true} slidesPerView={"auto"}>
@@ -25,7 +25,7 @@ function BannerItem({ item }) {
   const navigate = useNavigate()
   return (
     <div className="relative w-full h-full rounded-lg">
-      <img src={`https://image.tmdb.org/t/p/original/${poster_path}`} alt=""
+      <img src={tmdbAPI.imageOriginal(poster_path)} alt=""
         className="object-cover w-full h-full rounded-lg" />
       <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg overlay"></div>
       <div className="absolute text-white banner-content left-5 bottom-5">

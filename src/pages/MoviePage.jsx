@@ -1,6 +1,6 @@
 import useSWR from "swr"
-import { apiKey, fetcher } from "../config"
-import MovieCart from "../components/movie/MovieCart"
+import { fetcher, tmdbAPI } from "~/config"
+import MovieCart from "~/components/movie/MovieCart"
 import { useEffect, useState } from "react"
 import useDebounce from "../hooks/useDebounce"
 import ReactPaginate from 'react-paginate';
@@ -12,7 +12,7 @@ const MoviePage = () => {
   const [pageCount, setPageCount] = useState(0);
   const [nextPage, setNextPage] = useState(1)
   const [query, setQuery] = useState("")
-  const [url, setUrl] = useState(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=${nextPage}`)
+  const [url, setUrl] = useState(tmdbAPI.getMovieList("popular", nextPage))
   const debounceValue = useDebounce(query)
 
   const handleInputChange = (e) => { setQuery(e.target.value) }
@@ -21,9 +21,9 @@ const MoviePage = () => {
 
   useEffect(() => {
     if (debounceValue)
-      setUrl(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${debounceValue}&page=${nextPage}`)
+      setUrl(tmdbAPI.getMovieSearch(debounceValue, nextPage))
     else
-      setUrl(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=${nextPage}`)
+      setUrl(tmdbAPI.getMovieList("popular", nextPage))
   }, [debounceValue, nextPage])
 
   useEffect(() => {
