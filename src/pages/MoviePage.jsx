@@ -3,10 +3,16 @@ import { apiKey, fetcher } from "../config"
 import MovieCart from "../components/movie/MovieCart"
 import { useEffect, useState } from "react"
 import useDebounce from "../hooks/useDebounce"
+import ReactPaginate from 'react-paginate';
+
+const itemsPerPage = 20
+
 
 const MoviePage = () => {
+  const [pageCount, setPageCount] = useState(0);
+  const [nextPage, setNextPage] = useState(1)
   const [query, setQuery] = useState("")
-  const [url, setUrl] = useState(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`)
+  const [url, setUrl] = useState(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=${nextPage}`)
   const debounceValue = useDebounce(query)
 
   const handleInputChange = (e) => { setQuery(e.target.value) }
@@ -15,10 +21,19 @@ const MoviePage = () => {
 
   useEffect(() => {
     if (debounceValue)
-      setUrl(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${debounceValue}`)
+      setUrl(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${debounceValue}&page=${nextPage}`)
     else
-      setUrl(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`)
-  }, [debounceValue])
+      setUrl(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=${nextPage}`)
+  }, [debounceValue, nextPage])
+
+  useEffect(() => {
+    if (!data || !data.total_results) return
+    setPageCount(Math.ceil(data.total_results / itemsPerPage))
+  }, [data])
+
+  const handlePageClick = (e) => {
+    setNextPage(e.selected + 1)
+  };
 
   return (
     <div className="page-container">
@@ -39,11 +54,21 @@ const MoviePage = () => {
       {
         isLoading && <div className="w-10 h-10 mx-auto border-4 rounded-full border-primary border-t-transparent animate-spin"></div>
       }
-      <div className="grid grid-cols-4 gap-10 text-white">
+      <div className="grid grid-cols-4 gap-10 mb-10 text-white">
         {!isLoading && data && data.results?.length > 0 && data.results.map(item => (
           <MovieCart key={item.id} item={item}></MovieCart>
         ))}
       </div>
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel="next >"
+        onPageChange={handlePageClick}
+        pageRangeDisplayed={5}
+        pageCount={pageCount}
+        previousLabel="< previous"
+        renderOnZeroPageCount={null}
+        className="pagination"
+      />
     </div>
   )
 }
