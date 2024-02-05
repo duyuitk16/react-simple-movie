@@ -1,6 +1,8 @@
 import { SwiperSlide, Swiper } from "swiper/react"
 import useSWR from "swr"
 import { fetcher } from "../../config"
+import Button from "../button/Button"
+import { useNavigate } from "react-router-dom"
 
 
 const Banner = () => {
@@ -19,8 +21,8 @@ const Banner = () => {
 }
 
 function BannerItem({ item }) {
-  const { title, poster_path } = item
-
+  const { title, poster_path, id } = item
+  const navigate = useNavigate()
   return (
     <div className="relative w-full h-full rounded-lg">
       <img src={`https://image.tmdb.org/t/p/original/${poster_path}`} alt=""
@@ -33,7 +35,7 @@ function BannerItem({ item }) {
           <span className="px-4 py-2 border border-white rounded-lg">Avengers</span>
           <span className="px-4 py-2 border border-white rounded-lg">Avengers</span>
         </div>
-        <button className="px-6 py-3 text-xl font-semibold rounded-lg bg-primary">Watch Now</button>
+        <Button onClick={() => navigate(`/movie/${id}`)}>Watch now</Button>
       </div>
     </div>
   )
