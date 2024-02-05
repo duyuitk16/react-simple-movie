@@ -1,7 +1,7 @@
 import { SwiperSlide, Swiper } from "swiper/react"
 import MovieCart from "./MovieCart"
 import useSWR from "swr"
-import { fetcher } from "../../config"
+import { fetcher, tmdbAPI } from "~/config"
 
 //689b5231c55ce30f61d654cb4851693a
 // https://api.themoviedb.org/3/movie/now_playing?api_key=689b5231c55ce30f61d654cb4851693a
@@ -10,7 +10,7 @@ import { fetcher } from "../../config"
 
 
 const MovieList = ({ type }) => {
-  const { data, error, isLoading } = useSWR(`https://api.themoviedb.org/3/movie/${type}?api_key=689b5231c55ce30f61d654cb4851693a`, fetcher)
+  const { data } = useSWR(tmdbAPI.getMovieList(type), fetcher)
   return (
     <div className="list-movies">
       <Swiper grabCursor={true} slidesPerView={"auto"} spaceBetween={40}>
