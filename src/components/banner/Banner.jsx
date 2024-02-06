@@ -1,7 +1,7 @@
 import { SwiperSlide, Swiper } from "swiper/react"
 import useSWR from "swr"
 import { fetcher, tmdbAPI } from "~/config"
-import Button from "../button/Button"
+import Button from "~/components/button/Button"
 import { useNavigate } from "react-router-dom"
 
 

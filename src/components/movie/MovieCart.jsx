@@ -3,6 +3,7 @@ import Button from "~/components/button/Button"
 import { tmdbAPI } from "~/config"
 import PropTypes from 'prop-types'
 import { withErrorBoundary } from 'react-error-boundary'
+import LoadingSkeleton from "~/components/loading/LoadingSkeleton"
 
 
 const MovieCart = ({ item }) => {
@@ -38,4 +39,23 @@ function fallbackError() {
 
 export default withErrorBoundary(MovieCart, {
   fallback: fallbackError,
-}) 
+})
+
+
+export const MovieCartSkeleton = () => {
+  return (
+    <div className="flex flex-col h-full p-3 rounded-lg select-none movie-cart bg-slate-800">
+      <LoadingSkeleton height="250px" width="100%" radius="8px" className="mb-5"></LoadingSkeleton>
+      <LoadingSkeleton height="20px" width="100%" radius="8px" className="mb-5"></LoadingSkeleton>
+      <div className="flex items-center justify-between mb-10 opacity-50">
+        <span>
+          <LoadingSkeleton height="10px" width="50px" radius="8px"></LoadingSkeleton>
+        </span>
+        <span>
+          <LoadingSkeleton height="10px" width="20px" radius="8px"></LoadingSkeleton>
+        </span>
+      </div>
+      <LoadingSkeleton height="40px" width="100%" radius="8px" className="mt-auto"></LoadingSkeleton>
+    </div>
+  )
+} 

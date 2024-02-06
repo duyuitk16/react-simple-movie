@@ -1,5 +1,5 @@
 import { SwiperSlide, Swiper } from "swiper/react"
-import MovieCart from "./MovieCart"
+import MovieCart, { MovieCartSkeleton } from "./MovieCart"
 import useSWR from "swr"
 import { fetcher, tmdbAPI } from "~/config"
 import PropTypes from 'prop-types'
@@ -12,17 +12,33 @@ import PropTypes from 'prop-types'
 
 
 const MovieList = ({ type }) => {
-  const { data } = useSWR(tmdbAPI.getMovieList(type), fetcher)
+  const { data, isLoading } = useSWR(tmdbAPI.getMovieList(type), fetcher)
   return (
-    <div className="list-movies">
-      <Swiper grabCursor={true} slidesPerView={"auto"} spaceBetween={40}>
-        {data && data.results?.length > 0 && data.results.map(item => (
-          <SwiperSlide key={item.id}>
-            <MovieCart item={item}></MovieCart>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+    <>
+      {isLoading && <>
+        <div className="list-movies">
+          <Swiper grabCursor={true} slidesPerView={"auto"} spaceBetween={40}>
+            {new Array(4).fill(null).map((item, index) => (
+              <SwiperSlide key={index}>
+                <MovieCartSkeleton></MovieCartSkeleton>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </>
+      }
+      {!isLoading &&
+        <div className="list-movies">
+          <Swiper grabCursor={true} slidesPerView={"auto"} spaceBetween={40}>
+            {data && data.results?.length > 0 && data.results.map(item => (
+              <SwiperSlide key={item.id}>
+                <MovieCart item={item}></MovieCart>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      }
+    </>
   )
 }
 
