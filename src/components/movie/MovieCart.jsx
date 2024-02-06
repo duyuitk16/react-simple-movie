@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom"
 import Button from "~/components/button/Button"
 import { tmdbAPI } from "~/config"
+import PropTypes from 'prop-types'
+import { withErrorBoundary } from 'react-error-boundary'
+
 
 const MovieCart = ({ item }) => {
   const navigate = useNavigate()
@@ -19,4 +22,20 @@ const MovieCart = ({ item }) => {
   )
 }
 
-export default MovieCart
+MovieCart.propTypes = {
+  item: PropTypes.shape({
+    title: PropTypes.string,
+    poster_path: PropTypes.string,
+    vote_average: PropTypes.number,
+    release_date: PropTypes.string,
+    id: PropTypes.number
+  })
+}
+
+function fallbackError() {
+  return <p className="text-red-400 bg-red-100">Some thing went wrong with this component</p>
+}
+
+export default withErrorBoundary(MovieCart, {
+  fallback: fallbackError,
+}) 
