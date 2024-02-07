@@ -1,4 +1,4 @@
-const Button = ({ onClick, className, children, full = false, bgColor = "primary", type = "button" }) => {
+const Button = ({ onClick, className = "", children, full = false, bgColor = "primary", type = "button", ...props }) => {
   let bgClassName = "bg-primary"
   switch (bgColor) {
     case "secondary":
@@ -8,7 +8,7 @@ const Button = ({ onClick, className, children, full = false, bgColor = "primary
       break;
   }
   return (
-    <button type={type} onClick={onClick} className={`${full ? 'w-full' : ''} px-6 py-3 mt-auto font-semibold rounded-lg ${bgClassName} ${className} `}>{children}</button>
+    <button {...props} type={type} onClick={onClick} className={`${full ? 'w-full' : ''} px-6 py-3 mt-auto font-semibold rounded-lg ${bgClassName} ${className} `}>{children}</button>
   )
 }
 

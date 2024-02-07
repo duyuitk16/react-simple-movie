@@ -5,13 +5,14 @@ import { useEffect, useState } from "react"
 import useDebounce from "../hooks/useDebounce"
 import ReactPaginate from 'react-paginate'
 import { v4 } from 'uuid'
+import Button from "~/components/button/Button"
+import useSWRInfinite from "swr/infinite"
 
 
 const itemsPerPage = 20
 
 
 const MoviePage = () => {
-  const [pageCount, setPageCount] = useState(0);
   const [nextPage, setNextPage] = useState(1)
   const [query, setQuery] = useState("")
   const [url, setUrl] = useState(tmdbAPI.getMovieList("popular", nextPage))
@@ -19,7 +20,21 @@ const MoviePage = () => {
 
   const handleInputChange = (e) => { setQuery(e.target.value) }
 
-  const { data, isLoading } = useSWR(url, fetcher)
+  const {
+    data,
+    size,
+    setSize,
+    isLoading
+  } = useSWRInfinite(
+    (index) => url.replace("page=1", `page=${index + 1}`),
+    fetcher
+  );
+  const isEmpty = data?.[0]?.results.length === 0;
+  const isReachingEnd =
+    isEmpty || (data && data[data.length - 1]?.results.length < itemsPerPage);
+  const movies = data ? data.reduce((a, b) => a.concat(b.results), []) : []
+  console.log('🚀 ~ MoviePage ~ movies:', movies)
+
 
   useEffect(() => {
     if (debounceValue)
@@ -32,10 +47,6 @@ const MoviePage = () => {
     if (!data || !data.total_results) return
     setPageCount(Math.ceil(data.total_results / itemsPerPage))
   }, [data])
-
-  const handlePageClick = (e) => {
-    setNextPage(e.selected + 1)
-  };
 
   return (
     <div className="page-container">
@@ -55,7 +66,6 @@ const MoviePage = () => {
       </div>
       {
         isLoading &&
-        // <div className="w-10 h-10 mx-auto border-4 rounded-full border-primary border-t-transparent animate-spin"></div>
         <div className="grid grid-cols-4 gap-10 mb-10 text-white">
           {new Array(itemsPerPage).fill(0).map(item => (
             <MovieCartSkeleton key={v4()}></MovieCartSkeleton>
@@ -63,20 +73,11 @@ const MoviePage = () => {
         </div>
       }
       <div className="grid grid-cols-4 gap-10 mb-10 text-white">
-        {!isLoading && data && data.results?.length > 0 && data.results.map(item => (
+        {!isLoading && movies.length > 0 && movies.map(item => (
           <MovieCart key={item.id} item={item}></MovieCart>
         ))}
       </div>
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel="next >"
-        onPageChange={handlePageClick}
-        pageRangeDisplayed={5}
-        pageCount={pageCount}
-        previousLabel="< previous"
-        renderOnZeroPageCount={null}
-        className="pagination"
-      />
+      <div className="text-center"><Button disabled={isReachingEnd} className={isReachingEnd ? "bg-slate-300" : ""} onClick={() => isReachingEnd ? null : setSize(size + 1)}>Load more</Button></div>
     </div >
   )
 }
